@@ -64,9 +64,13 @@ export function receiveMessage(ev, cb) {
     return;
   }
 
-  if (data && data.adId && data.message && HANDLER_MAP.hasOwnProperty(data.message)) {
+  if (data && data.adId && data.message && Object.prototype.hasOwnProperty.call(HANDLER_MAP, data.message)) {
+    const handler = HANDLER_MAP[data.message];
+    if (typeof handler !== 'function') {
+      return;
+    }
     getBidToRender(data.adId, isRenderRequest(data)).then((adObject) => {
-      HANDLER_MAP[data.message](ensureAdId(data.adId, getReplier(ev)), data, adObject);
+      handler(ensureAdId(data.adId, getReplier(ev)), data, adObject);
       cb && cb();
     });
   }
